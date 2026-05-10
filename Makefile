@@ -1,7 +1,7 @@
 .PHONY: clean
 NAME := rd
 SRC := main.cpp
-LIBS := -lraylib -lopengl32 -lgdi32 -lwinmm
+LIBS := -lraylib -lopengl32 -lgdi32 -lwinmm -mwindows
 STD := c++20
 main: $(SRC)
 	g++ --std=$(STD) -o $(NAME) $(SRC) $(LIBS)

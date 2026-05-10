@@ -3,7 +3,7 @@
 float clamp(float val, float min, float max) { return val > max ? max : val < min ? min
                                                                                   : val; };
 
-const int sw = 480, sh = 480;
+const int sw = 500, sh = 500;
 struct Cell
 {
     float a = 1.0f, b = 0.0f;
@@ -43,6 +43,7 @@ int main(int argc, char **argv)
         }
     }
     InitWindow(sw, sh, "Reaction-Diffusion");
+    SetTraceLogLevel(LOG_NONE);
     float mat[] = {0.05, 0.2, 0.05, 0.2, -1, 0.2, 0.05, 0.2, 0.05};
     Texture2D tex = LoadTextureFromImage(GenImageColor(sw, sh, BLACK));
     int *pixels = new int[sw * sh];
@@ -53,14 +54,14 @@ int main(int argc, char **argv)
             for (int x = 1; x < sw - 1; x++)
             {
                 float a = grid[y * sw + x].a, b = grid[y * sw + x].b;
-                next[y * sw + x].a = clamp(a + (dA * laplace(x, y, grid, mat, true) - a * b * b + f * (1 - a)) * 1.15f, 0.0f, 1.0f);
-                next[y * sw + x].b = clamp(b + (dB * laplace(x, y, grid, mat, false) + a * b * b - (k + f) * b) * 1.15f, 0.0f, 1.0f);
+                next[y * sw + x].a = clamp(a + (dA * laplace(x, y, grid, mat, true) - a * b * b + f * (1 - a)), 0.0f, 1.0f);
+                next[y * sw + x].b = clamp(b + (dB * laplace(x, y, grid, mat, false) + a * b * b - (k + f) * b), 0.0f, 1.0f);
                 int c = clamp((int)(255 - (next[y * sw + x].a - next[y * sw + x].b) * 255), 0, 255);
                 pixels[y * sw + x] = 255 << 24 | c << 16 | c << 8 | c;
             }
         }
-        UpdateTexture(tex, pixels);
         std::swap(grid, next);
+        UpdateTexture(tex, pixels);
         BeginDrawing();
         ClearBackground(BLACK);
         DrawTexture(tex, 0, 0, WHITE);
