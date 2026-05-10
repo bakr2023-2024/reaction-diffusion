@@ -47,6 +47,7 @@ int main(int argc, char **argv)
     float mat[] = {0.05, 0.2, 0.05, 0.2, -1, 0.2, 0.05, 0.2, 0.05};
     Texture2D tex = LoadTextureFromImage(GenImageColor(sw, sh, BLACK));
     int *pixels = new int[sw * sh];
+
     while (!WindowShouldClose())
     {
         for (int y = 1; y < sh - 1; y++)
