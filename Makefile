@@ -1,5 +1,5 @@
 .PHONY: clean
-NAME := main
+NAME := rd
 SRC := main.cpp
 LIBS := -lraylib -lopengl32 -lgdi32 -lwinmm
 STD := c++20
