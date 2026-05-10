@@ -1,6 +1,8 @@
 #include <raylib.h>
-#include <vector>
-#include <algorithm>
+#include <string>
+float clamp(float val, float min, float max) { return val > max ? max : val < min ? min
+                                                                                  : val; };
+
 const int sw = 480, sh = 480;
 struct Cell
 {
@@ -20,9 +22,17 @@ float laplace(int x, int y, const Cell *grid, const float mat[], bool forA)
     }
     return sum;
 }
-int main()
+int main(int argc, char **argv)
 {
-    int fps = 60;
+    float dA = 1.0f, dB = 0.5f, f = 0.055f, k = 0.062f;
+    if (argc == 5)
+        k = std::stof(argv[4]);
+    if (argc >= 4)
+        f = std::stof(argv[3]);
+    if (argc >= 3)
+        dB = std::stof(argv[2]);
+    if (argc >= 2)
+        dA = std::stof(argv[1]);
     Cell *grid = new Cell[sw * sh];
     Cell *next = new Cell[sw * sh];
     for (int x = -100; x < 100; x++)
@@ -33,9 +43,6 @@ int main()
         }
     }
     InitWindow(sw, sh, "Reaction-Diffusion");
-    SetTargetFPS(fps);
-    float dt = 1.0f / fps;
-    float dA = 1.0f, dB = 0.5f, f = 0.055f, k = 0.062f;
     float mat[] = {0.05, 0.2, 0.05, 0.2, -1, 0.2, 0.05, 0.2, 0.05};
     Texture2D tex = LoadTextureFromImage(GenImageColor(sw, sh, BLACK));
     int *pixels = new int[sw * sh];
@@ -46,9 +53,9 @@ int main()
             for (int x = 1; x < sw - 1; x++)
             {
                 float a = grid[y * sw + x].a, b = grid[y * sw + x].b;
-                next[y * sw + x].a = std::clamp(a + (dA * laplace(x, y, grid, mat, true) - a * b * b + f * (1 - a)) * 1.15f, 0.0f, 1.0f);
-                next[y * sw + x].b = std::clamp(b + (dB * laplace(x, y, grid, mat, false) + a * b * b - (k + f) * b) * 1.15f, 0.0f, 1.0f);
-                int c = std::clamp((int)((next[y * sw + x].a - next[y * sw + x].b) * 255), 0, 255);
+                next[y * sw + x].a = clamp(a + (dA * laplace(x, y, grid, mat, true) - a * b * b + f * (1 - a)) * 1.15f, 0.0f, 1.0f);
+                next[y * sw + x].b = clamp(b + (dB * laplace(x, y, grid, mat, false) + a * b * b - (k + f) * b) * 1.15f, 0.0f, 1.0f);
+                int c = clamp((int)(255 - (next[y * sw + x].a - next[y * sw + x].b) * 255), 0, 255);
                 pixels[y * sw + x] = 255 << 24 | c << 16 | c << 8 | c;
             }
         }
